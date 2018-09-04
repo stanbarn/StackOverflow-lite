@@ -1,7 +1,5 @@
 from flask import Flask, request, jsonify
 import uuid
-from pprint import pprint
-import json
 from api import utilities
 from flask import Blueprint
 import re
@@ -10,7 +8,6 @@ from flask_jwt_extended import create_access_token, get_jwt_identity
 from flask_jwt_extended import jwt_required
 
 database = DatabaseConnection()
-# database.fetch_username('test')
 mod = Blueprint('questions', __name__)
 json_utility = utilities
 
@@ -107,14 +104,11 @@ def create_user():
 @mod.route('/signin', methods=['POST'])
 def signin_user():
     """
-    Function enables user to login.
-    Returns a success Message and the logged in user object in case of successful login.
+    Function enables user to login. Returns a success Message and the logged in user object in case of successful login.
     """
     data = request.get_json()
-
     username = data.get('username')
     password = data.get('password')
-
     # Check that username has been supplied
     if not username or username.isspace():
         return jsonify({
@@ -129,8 +123,6 @@ def signin_user():
 
     # Fetch user by username
     user = database.fetch_user_by_username(username)
-    print(username)
-    print(user)
     if user is None:
         return jsonify({
             'Message': 'Sorry, Failed  authentication. Username does not exist!'
@@ -156,7 +148,6 @@ def add_question():
     Function enables user to create a question
     """
     data = request.get_json()
-
     details = data.get('question')
     user_id = data.get('userId')
 
@@ -188,7 +179,6 @@ def add_answer(questionId):
     Function enables user to add an answer to a question on the platform..
     """
     data = request.get_json()
-
     userId = data.get('userId')
     details = data.get('answer')
 

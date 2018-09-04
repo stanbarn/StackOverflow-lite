@@ -2,8 +2,7 @@ from flask import Flask, request, jsonify
 import uuid
 from pprint import pprint
 import json
-from api import  utilities
-from api.models import Answer, Question, User, questions, users, answers
+from api import utilities
 from flask import Blueprint
 import re
 from api.database import DatabaseConnection
@@ -21,7 +20,7 @@ def landing():
 
 
 @mod.route('/signup', methods=['POST'])
-def registerUser():
+def create_user():
     """
     Function to enables user to sign up on the platform. It checks if all the
     required data is added by the user and then validates the email and password. Returns user object in for successful registration.
@@ -36,84 +35,80 @@ def registerUser():
     # check if username exists
     if not username or username.isspace():
         return jsonify({
-            'message': 'Sorry, enter your username!'
+            'Message': 'Sorry, enter your username!'
         }), 400
 
     # check if email exists
     if not email or email.isspace():
         return jsonify({
-            'message': 'Sorry, enter your email!'
+            'Message': 'Sorry, enter your email!'
         }), 400
     # check if password exists
     if not password or password.isspace():
         return jsonify({
-            'message': 'Sorry, you did not enter your password!'
+            'Message': 'Sorry, you did not enter your password!'
         }), 400
 
     # validate email address
     # source: https://docs.python.org/2/howto/regex.html
     if not re.match(r"[^@.]+@[A-Za-z]+\.[a-z]+", email):
         return jsonify({
-            'message': 'Invalid email address!'
+            'Message': 'Invalid email address!'
         }), 400
 
-    # validate password. make sure the password is strong
-    # source: https://docs.python.org/2/howto/regex.html
+    # validate password. make sure the password is strong enough
     low = re.search(r"[a-z]", password)
     up = re.search(r"[A-Z]", password)
     num = re.search(r"[0-9]", password)
     if not all((low, up, num)):
         return jsonify({
-            'message': 'Passwords should include upper and lower cases, and numeric characters'
+            'Message': 'Passwords should include upper, lower cases, and numeric characters'
         }), 400
 
     # make sure password has a minimum length of 6 characters
     if len(password) < 6:
         return jsonify({
-            'message': 'Passwords should be at least 6 characters long!'
+            'Message': 'Passwords should be at least 6 characters long!'
         }), 400
 
     # check if username already exists
     if database.fetch_user_by_username(username):
         return jsonify({
-            'message': 'Sorry, that username is registered to another user!'
+            'Message': 'Sorry, that username is registered to another user!'
         }), 400
 
     # check if email exists
     if database.fetch_user_by_email(email):
         return jsonify({
-            'message': 'Sorry, that email is registered to another user!'
+            'Message': 'Sorry, that email is registered to another user!'
         }), 400
 
-    # create user object
-    user = User(user_id, username, email, password)
-
-    # hashed_password = generate_password_hash(password)
+    # hash password
+    hashed_password = json_utility.generate_password_hash(password)
     try:
-        if database.create_user(user_id, username, email, password):
-            users.append(user)
+        if database.create_user(user_id, username, email, hashed_password):
             return jsonify({
-                'Username': user.username,
-                'message': '{} has registered successfully'.format(username)
+                'Username': username,
+                'Message': '{} has registered successfully'.format(username)
             }), 201
         else:
             return jsonify({
-                'Username': user.username,
-                'message': '{} was not created '.format(username)
+                'Username': username,
+                'Message': '{} was not created '.format(username)
             }), 400
-
+            
     except Exception as e:
         return jsonify({
-            'Username': user.username,
-            'message': '{} was not created '.format(e)
+            'Username': username,
+            'Message': '{} was not created '.format(e)
         }), 400
 
 
 @mod.route('/signin', methods=['POST'])
-def signinUser():
+def signin_user():
     """
     Function enables user to login.
-    Returns a success message and the logged in user object in case of successful login.
+    Returns a success Message and the logged in user object in case of successful login.
     """
     data = request.get_json()
 
@@ -123,36 +118,39 @@ def signinUser():
     # Check that username has been supplied
     if not username or username.isspace():
         return jsonify({
-            'message': 'You did not enter your username!'
+            'Message': 'You did not enter your username!'
         }), 400
 
     # Check that password has been supplied
     if not password or password.isspace():
         return jsonify({
-            'message': 'You did not enter your password!'
+            'Message': 'You did not enter your password!'
         }), 400
 
     # Fetch user by username
-    if not database.fetch_username(username):
+    user = database.fetch_user_by_username(username)
+    print(username)
+    print(user)
+    if user is None:
         return jsonify({
-            'message': 'Sorry, wrong username!'
+            'Message': 'Sorry, Failed  authentication. Username does not exist!'
+        }), 400
+    # check password is true
+    if json_utility.verify_password_hash(password, user[3]):
+
+        # Get user Id and generate authentication token
+        access_token = create_access_token(username)
+        return jsonify({
+            'Token': access_token,
+            'Message': '{} is logged in.'.format(username)
+        }), 200
+    else:
+        return jsonify({
+            'Message': 'Sorry, Failed  authentication. check username and password!'
         }), 400
 
-    # Fetch user by username and password
-    if not database.fetch_user_by_username_password(username, password):
-        return jsonify({
-            'message': 'Sorry, user does not exist!'
-        }), 400
-    # Get user Id and generate authentication token
-    user = database.fetch_username(username)
-    access_token = create_access_token(user)
-    return jsonify({
-        'token': access_token,
-        'message': '{} is logged in.'.format(username)
-    }), 200
 
-
-@mod.route('/questions/add', methods=['POST'])
+@mod.route('/questions', methods=['POST'])
 def add_question():
     """
     Function enables user to create a question
@@ -160,71 +158,85 @@ def add_question():
     data = request.get_json()
 
     details = data.get('question')
-    user_id = data.get('user_id')
+    user_id = data.get('userId')
 
     if not details or details.isspace():
         return jsonify({
-            "message": "Sorry, you didn't enter any question!"
+            "Message": "Sorry, you didn't enter any question!"
         }), 400
 
-    qn = Question(user_id, details)
+    question_request = database.create_question(user_id, details)
 
-    questionrequest = qn.add_question()
-
-    if not questionrequest:
+    if not question_request:
         return jsonify({
-            "message": "Sorry, you didn't enter any question!"
+            "Message": "Sorry, you didn't enter any question!"
         }), 400
 
-    question = qn.fetch_question(questionrequest)
+    question = database.fetch_question_by_id(question_request)
 
-    print(question)
-
-    questions.append(question)
+    question_json = json_utility.question_to_json(question)
 
     return jsonify({
-        "question": question,
-        "message": "Question added successfully!"
+        "Question": question_json,
+        "Message": "Question added successfully!"
     }), 201
 
 
-@mod.route('/questions/answer/<int:questionId>', methods=['POST'])
+@mod.route('/questions/<int:questionId>/answers', methods=['POST'])
 def add_answer(questionId):
     """
     Function enables user to add an answer to a question on the platform..
     """
     data = request.get_json()
 
-    details = data.get('details')
+    userId = data.get('userId')
+    details = data.get('answer')
 
     try:
         if not details or details.isspace():
             return jsonify({
-                'message': 'Sorry, you did not enter any answer!'
-            }), 400
-        if len(questions) == 0:
-            return jsonify({
-                'message': 'Sorry, there are no questions yet!!'
+                'Message': 'Sorry, you did not enter any answer!'
             }), 400
 
-        question = questions[questionId - 1]
-        answer = Answer(questionId, details)
-        answers.append(answer)
+        question = database.fetch_question_by_id(questionId)
+        if not question:
+            return jsonify({
+                'Message': 'Sorry, question does not exist!'
+            }), 400
+
+        addAnswer = database.insert_answer_for_question(userId, questionId, details)
+        if not addAnswer:
+            return jsonify({
+                'Message': 'Sorry, there are no questions yet!!'
+            }), 400
+
+        answer = database.fetch_answers_by_id(addAnswer)
+        if answer is None:
+            return jsonify({
+                'Message': 'Sorry, errors occurred!!'
+            }), 400
+
+        questionJson = json_utility.question_to_json(question)
+        answerJson = json_utility.answer_to_json(answer)
+
+        # answers.append(addAnswer)
 
         return jsonify({
-            'Question': question.__dict__,
-            'Answer': answer.__dict__,
+            'Question': questionJson,
+            'Answer': answerJson,
             'Message': 'Answer added succesfully!'
         }), 201
+
     except IndexError:
         return jsonify({
-            'message': 'Question does not exist.'
+            'Message': 'Question does not exist.'
         }), 400
+
 
 @mod.route('/questions/answers/<int:questionId>', methods=['GET'])
 def get_answers(questionId):
     """
-    Function enables user to get answers to a question on the platform..
+    Function enables user to get answers to a question.
     """
 
     try:
@@ -232,27 +244,28 @@ def get_answers(questionId):
         question = database.fetch_question_by_id(questionId)
         if not question:
             return jsonify({
-                'message': 'Question does not exist.'
+                'Message': 'Question does not exist.'
             }), 400
 
-        answerResponse = database.fetch_answers_for_question(questionId)
+        answer_response = database.fetch_answers_for_question(questionId)
 
-        if len(answerResponse) == 0:
+        if len(answer_response) == 0:
             return jsonify({
-                'message': 'No answer was found.'
+                'Message': 'No answer was found.'
             }), 400
-
-        answers.append(answerResponse)
+        
+        question_json = json_utility.question_to_json(question)
+        answer_json = json_utility.answers_to_json_list_utilities(answer_response)
 
         return jsonify({
-            'Question': question.__dict__,
-            'Answer': answers.__dict__,
+            'Question': question_json,
+            'Answer': answer_json,
             'Message': 'answers to question!'
-        }), 201
+        }), 200
 
     except IndexError:
         return jsonify({
-            'message': 'Question does not exist.'
+            'Message': 'Question does not exist.'
         }), 400
 
 
@@ -264,15 +277,16 @@ def get_question(questionId):
     """
     if not questionId or questionId < 1:
         return jsonify({
-            'message': 'Sorry! questionId cannot be null.'
+            'Message': 'Sorry! questionId cannot be null.'
         }), 404
 
     try:
         question = database.fetch_question_by_id(questionId)
         if not question:
             return jsonify({
-                'message': 'Sorry! questionId cannot be null.'
+                'Message': 'Sorry! questionId cannot be null.'
             }), 404
+            
         json_question = json_utility.question_to_json(question)
         answers = database.fetch_answers_for_question(questionId)
         if not answers or len(answers) < 1:
@@ -292,11 +306,11 @@ def get_question(questionId):
         }), 200
     except IndexError:
         return jsonify({
-            'message': 'Question does not exist.'
+            'Message': 'Question does not exist.'
         }), 404
 
 
-@mod.route('/questions/all', methods=['GET'])
+@mod.route('/questions', methods=['GET'])
 def get_questions():
     """
     Function enables a user to fetch all questions
@@ -304,32 +318,32 @@ def get_questions():
     questionsResponse = database.fetch_all_questions()
     if len(questionsResponse) == 0:
         return jsonify({
-            'message': 'Sorry there are no questions yet!'
+            'Message': 'Sorry there are no questions yet!'
         }), 400
 
-    qnjson = json_utility.questions_to_json_list_utilities(questionsResponse)
+    qnJson = json_utility.questions_to_json_list_utilities(questionsResponse)
 
     return jsonify({
-        'Questions': qnjson,
-        'message': 'Questions fetched successfully!'
+        'Questions': qnJson,
+        'Message': 'Questions fetched successfully!'
     }), 200
 
 
-@mod.route('/questions/remove/<int:questionId>', methods=['DELETE'])
-def delete_question(question_Id):
+@mod.route('/questions/<int:questionId>', methods=['DELETE'])
+def delete_question(questionId):
     try:
-        if database.delete_question(question_Id):
+        if database.delete_question(questionId):
                 return jsonify({
-                    'message': 'Question deleted!'
+                    'Message': 'Question deleted!'
                 }), 200
 
     except IndexError:
         return jsonify({
-            'message': 'Question does not exist.'
+            'Message': 'Question does not exist.'
         }), 400
 
 
-@mod.route('/qustions/<string:userId>', methods=['GET'])
+@mod.route('/questions/users/<string:user_id>', methods=['GET'])
 def get_questions_for_user(user_id):
     """
     Function enables a user to fetch all questions
@@ -337,10 +351,11 @@ def get_questions_for_user(user_id):
     questions = database.fetch_questions_for_user(user_id)
     if len(questions) == 0:
         return jsonify({
-            'message': 'Sorry there are no questions yet!'
+            'Message': 'Sorry there are no questions yet!'
         }), 400
-
+        
+    json_questions = json_utility.questions_to_json_list_utilities(questions)
     return jsonify({
-        'Questions': [question.__dict__ for question in questions],
-        'message': 'Questions fetched successfully!'
+        'Questions': json_questions,
+        'Message': 'Questions fetched successfully!'
     }), 200

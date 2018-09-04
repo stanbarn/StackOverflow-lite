@@ -1,0 +1,8 @@
+[report]
+omit =
+    */python?.?/*
+    */.vscode/*
+    */site-packages/nose/*
+    */__pycache__/*
+    *.pyc
+    */env/*

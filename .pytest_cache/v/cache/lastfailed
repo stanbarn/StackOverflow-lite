@@ -1,0 +1,3 @@
+{
+  "tests.py::TestApiEndPoints::test_that_can_signin_to_platform": true
+}

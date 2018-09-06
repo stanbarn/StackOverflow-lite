@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stackoverflow-Lite</title>
+  <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+  <nav class="navbar navbar-inverse">
+    <section class="container">
+      <ul class="stack-actions-bar navbar-right" role="search">
+        <div class="form-group">
+          <p>
+            <a href="sign-up.html" class = "nav-text">sign up</a>
+            <a href="sign-in.html" class = "nav-text">log in</a>
+            <input type="text" class="form-control" placeholder="Search">
+          </p>
+        </div>
+       </ul>
+    </section>
+  </nav>
+  <section class="container">
+    <div class= "full-width"> 
+      <nav class="navbar-header">
+        <div class= "img-responsive">
+          <a href="home.html" class="logo">
+            <img src="images/logo.png" width="100%" />
+          </a>
+        </div>
+      </nav>
+    </div>
+  </section>
+  <main class = "container">
+    <div class = "row"> 
+      <div class = "small-grid-2">
+        
+      </div>
+      <div class = "small-grid-2 panel panel-default">
+        <form action="home.html" method="POST">
+          <div class="form-group">
+            <div class="form-group">
+              <label for="display-name">Username</label>
+              <input type="name" class="form-control" id="display-name" placeholder="J. Doe">
+            </div>
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" placeholder="you@example.org">
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Password</label>
+            <input type="password" class="form-control" placeholder="********">
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Confirm Password</label>
+            <input type="password" class="form-control" placeholder="********">
+          </div>
+          <a href = "#">Already Registered? Signin</a>
+          <button type="submit" class="btn btn-primary float-right">Sign up</button><br />
+          <br />
+          <p class = "align-center">By registering, you agree to the <a href = "http://stackexchange.com/legal/privacy-policy" target = "blank">privacy policy</a> and <a href = "http://stackexchange.com/legal/terms-of-service" target = "blank">terms of service</a>.
+        </form>
+      </div>
+      <div class = "small-grid-2">
+        
+      </div>
+    </div>
+  </main>
+</body>
+</html>

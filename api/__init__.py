@@ -6,8 +6,8 @@ from flask_swagger_ui import get_swaggerui_blueprint
 
 app = Flask(__name__)
 
-SWAGGER_URL = '/docs'  # URL for exposing Swagger UI (without trailing '/')
-API_URL = 'http://127.0.0.1:5000/api/v1'  # Our API url (can of course be a local resource)
+SWAGGER_URL = '/api/v1/docs'  # URL for exposing Swagger UI (without trailing '/')
+API_URL = 'https://stanley-stackoverflow-lite.herokuapp.com/api/v1'  # Our API url (can of course be a local resource)
 
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,  # Swagger UI static files will be mapped to '{SWAGGER_URL}/dist/'

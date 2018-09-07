@@ -1,15 +1,25 @@
 import psycopg2
 from pprint import pprint
 from datetime import datetime
+import urllib.parse as urlparse
+import os
 
 class DatabaseConnection:
     try:
         def __init__(self):
+            url = urlparse.urlparse(os.environ['DATABASE_URL'])
+            database_name = url.path[1:]
+            user = url.username
+            password = url.password
+            host = url.hostname
+            port = url.port
+
             self.connection = psycopg2.connect(
-                """
-                dbname='stackoverflowlite' user='postgres' password='qwerty'
-                host='localhost' port='5432'
-                """
+                dbname=database_name,
+                user=user,
+                password=password,
+                host=host,
+                port=port
             )
             self.connection.autocommit = True
             self.cursor = self.connection.cursor()

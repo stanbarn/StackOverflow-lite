@@ -5,7 +5,10 @@ def question_to_json(single_question):
         "questionId": single_question[0],
         "userId": single_question[1],
         "question": single_question[2],
-        "createdOn": single_question[3]
+        "createdOn": single_question[3],
+        "userId": single_question[4],
+        "username": single_question[5],
+        "email": single_question[6],
     }
     return json_result
 

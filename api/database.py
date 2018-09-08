@@ -7,19 +7,23 @@ import os
 class DatabaseConnection:
     try:
         def __init__(self):
-            url = urlparse.urlparse(os.environ['DATABASE_URL'])
-            database_name = url.path[1:]
-            user = url.username
-            password = url.password
-            host = url.hostname
-            port = url.port
+            # url = urlparse.urlparse(os.environ['DATABASE_URL'])
+            # database_name = url.path[1:]
+            # user = url.username
+            # password = url.password
+            # host = url.hostname
+            # port = url.port
 
             self.connection = psycopg2.connect(
-                dbname=database_name,
-                user=user,
-                password=password,
-                host=host,
-                port=port
+                #dbname=database_name,
+                #user=user,
+                #password=password,
+                #host=host,
+                #port=port
+                """
+                dbname='stackoverflowlite' user='postgres' password='qwerty'
+                host='localhost' port='5432'
+                """
             )
             self.connection.autocommit = True
             self.cursor = self.connection.cursor()
@@ -91,7 +95,7 @@ class DatabaseConnection:
 
     def fetch_question_by_id(self, question_id):
         fetch_question_command = """
-        SELECT * FROM stackoverflow.questions WHERE "questionId" = '{}'
+        SELECT * FROM stackoverflow.questions INNER JOIN stackoverflow.users ON (questions."userId" = users."userId") WHERE "questionId" = '{}'
         """.format(question_id)
         self.cursor.execute(fetch_question_command)
 
@@ -100,7 +104,7 @@ class DatabaseConnection:
 
     def fetch_questions_for_user(self, user_id):
         fetch_user_question_command = """
-        SELECT * FROM stackoverflow.questions WHERE "userId" = '{}'
+        SELECT * FROM stackoverflow.questions  INNER JOIN stackoverflow.users ON (questions."userId" = users."userId") WHERE "userId" = '{}'
         """.format(user_id)
         self.cursor.execute(fetch_user_question_command)
 
@@ -109,8 +113,9 @@ class DatabaseConnection:
 
     def fetch_all_questions(self):
         fetch_all_questions_command = """
-        SELECT * FROM stackoverflow.questions
+        SELECT * FROM stackoverflow.questions INNER JOIN stackoverflow.users ON (questions."userId" = users."userId")
         """
+        print(fetch_all_questions_command)
         self.cursor.execute(fetch_all_questions_command)
         
         questions = self.cursor.fetchall()
@@ -119,7 +124,7 @@ class DatabaseConnection:
 
     def fetch_question_for_user(self, user_id, question_id):
         fetch_user_question_command = """
-        SELECT * FROM stackoverflow.questions WHERE "userId" = '{}' AND questions.questionId='{}'
+        SELECT * FROM stackoverflow.questions INNER JOIN stackoverflow.users ON (questions."userId" = users."userId") WHERE "userId" = '{}' AND questions.questionId='{}'
         """.format(user_id, question_id)
         self.cursor.execute(fetch_user_question_command)
 

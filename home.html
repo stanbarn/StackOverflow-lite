@@ -2,8 +2,9 @@
 <html>
 <head>
   <title>Stackoverflow-Lite</title>
-<link rel="stylesheet" type="text/css" href="css/styles.css">
-<script type="text/javascript" src="./js/questions.js"></script>
+<link rel="stylesheet" type="text/css" href="./css/styles.css" />
+<script type="text/javascript" src="./js/index.js"></script>
+
 </head>
 <body>
     <nav class="navbar navbar-inverse">
@@ -11,8 +12,8 @@
         <ul class="stack-actions-bar navbar-right" role="search">
           <div class="form-group">
             <p>
-              <a href="sign-up.html" class = "nav-text">sign up</a>
-              <a href="sign-in.html" class = "nav-text">log in</a>
+              <a href="./sign-up.html" class = "nav-text">sign up</a>
+              <a href="./sign-in.html" class = "nav-text">log in</a>
               <input type="text" class="form-control" placeholder="Search">
             </p>
           </div>
@@ -23,91 +24,83 @@
       <div class= "full-width"> 
         <nav class="navbar-header">
           <div class= "img-responsive">
-            <a href="home.html" class="logo">
-              <img src="images/logo.png" width="100%" />
+            <a href="./home.html" class="logo">
+              <img src="./images/logo.png" width="100%" />
             </a>
           </div>
         </nav>
       <div class="stack-actions-bar navbar-right">
         <div class="btn-link">
-          <a href="home.html" class="btn btn-default active" role="button">Questions</a> 
-          <a href="home.html" class="btn btn-default active" role="button">My questions</a> 
-          <a href="ask-question.html" class="btn btn-default active" role="button">Ask Question</a> 
+          <a href="#" class="btn btn-default active" onclick="get_questions()">Questions</a> 
+          <a href="./home.html" class="btn btn-default active" role="button">My questions</a> 
+          <a href="#" onclick="ask_question()" class="btn btn-default active">Ask Question</a> 
         </div>
       </div>
     </section>
   <main class = "container"> 
-    <div>
+    <div class="wrapper">
       <div class = "mid-grid">
-        <h4>Top Questions</h4>
+        <h4 id="page-title"></h4>
       </div>
       <div class = "col-md-3">
       </div>
     </div> 
     <div class = "row"> 
-      <div class = "col-md-10">
-        <div class = "panel-body">
-          <table class="table">
-            
-            <tr class="warning borderless">
-              <td>
-                  <div class = "question">
-                      <a href = "question.html"><h4>Multiple Image File Upload with Captions</h4></a>
-                  </div>
-                  <div class = "answer">
-                      <a class = "btn btn-primary">answer</a>
-                      <p class = "asked">modified 25 min ago Nevi</p>
-                  </div>
-              </td>
-            </tr>
-            <tr class="warning borderless">
-              <td>
-                  <div class = "question">
-                      <a href = "question.html"><h4>Multiple Image File Upload with Captions</h4></a>
-                  </div>
-                  <div class = "answer">
-                      <a href="answer-question.html" class = "btn btn-primary">answer</a>
-                      <p class = "asked">modified 25 min ago Nevi</p>
-                  </div>
-              </td>
-            </tr> 
-            <tr class="warning borderless">
-              <td>
-                  <div class = "question">
-                      <a href = "question.html"><h4>Multiple Image File Upload with Captions</h4></a>
-                  </div>
-                  <div class = "answer">
-                      <a href="answer-question.html" class = "btn btn-primary">answer</a>
-                      <p class = "asked">modified 25 min ago brian</p>
-                  </div>
-              </td>
-            </tr>
-            <tr class="borderless">
-              <td>
-                  <div class = "question">
-                      <a href = "question.html"><h4>Multiple Image File Upload with Captions</h4></a>
-                  </div>
-                  <div class = "answer">
-                      <a href="answer-question.html" class = "btn btn-primary">answer</a>
-                      <p class = "asked">modified 25 min ago Barna</p>
-                  </div>
-              </td>
-            </tr> <!-- end row 4 -->
-            <tr class = "borderless">
-              <td>
-                  <div class = "question">
-                      <a href = "question.html"><h4>Multiple Image File Upload with Captions</h4></a>
-                  </div>
-                  <div class = "answer">
-                      <a href="answer-question.html" class = "btn btn-primary">answer</a>
+      <div class = "col-md-10" id="question-box">
+        <div class = "panel-body" id="questions-table-box">
 
-                      <p class = "asked">modified 25 min ago Barna</p>
-                  </div>
-              </td>
-            </tr> 
-          </table>
         </div> 
       </div> 
+      <div class="answer-question-box" id="answer-question-box-1">
+          <div class = "full-width" id="answer-question-box">
+              <div class="question question-box panel" id="question-to-answer">
+                
+              </div>
+          </div>
+          <div class = "mid-grid-2 panel margin-2x" id="answer-res" style="min-height: 215px;">
+              <div id="add-answer-response">
+              </div>
+          </div>
+          <div class = "mid-grid-2 panel margin-2x">
+            <form id="answer-form">
+              <h4>Post answer to question</h4>
+              <div class="form-group">
+                <label>answer</label>
+                <div id="userId"></div>
+                <div id="questionId"></div>
+                <textarea name="answer" class="form-control" placeholder="Type your answer" style="width: 525px; height: 60px;"></textarea>
+              </div>
+              <div id="answer_submit"></div>
+            </form>
+          </div>
+      </div>
+
+      <div class="mid-grid-2" id="question-and-answers">
+        <div class="question question-box panel" >
+          <p id="question-answer-2">
+          </p>
+          <div class = "full-width panel margin-2x question-answer">
+            <h4 id="ans_message_ff"></h4>
+            <div class="ans-box">
+              <ul class="ans" id="answer_lists">
+                  
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="ask-question" class="ask-question">
+          <div class = "col-md-13 panel ask-question-form-panel" id="ask_question_form_panel" style="width:45%;">
+              <form id="ask_question_form">
+                  <h4>Ask question</h4>
+                  <div class="form-group">
+                    <input type="hidden" name="userId" value="d32c7951-2d28-43d1-b9ad-93f096982be2"></div>
+                    <textarea name="question" class="form-control" placeholder="Type your question" style="width: 525px; height: 188px;"></textarea>
+                    <a href="#" type="submit" style="margin-top:20px;" class="btn btn-primary float-right" onclick="post_question()">post question</a>
+                  </div>
+              </form>
+          </div>
+      </div>
     </div> 
   </main> 
 </body>

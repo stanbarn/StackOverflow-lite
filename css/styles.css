@@ -380,6 +380,9 @@ padding-left: 15px;
   position: relative;
 }
 
+.wrapper {
+  margin-top: 100px;
+}
 .panel-body {
 
   padding: 15px;
@@ -484,6 +487,10 @@ td, th {
 }
 .top-questions-stats {
   text-align: center;
+}
+
+#question-and-answers, #answer-res, #answer-form-x {
+  display: none;
 }
 
 .borderless td, .borderless th {
@@ -630,4 +637,21 @@ section {
   float: right;
   margin-left: 15px;
   margin-right: 15px;
+}
+.answer-question-box, .answer-res {
+  display: none;
+}
+.answer-res {
+  display: none;
+}
+.ask-question {
+  display: block;
+  margin: auto;
+  float: left;
+  width: 100%;
+}
+.ask-question-form-panel {
+  width: 45%;
+  float: none;
+  margin: auto;
 }

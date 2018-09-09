@@ -1,10 +1,12 @@
 from flask import Flask
 from api.api import mod
 from api import api
+from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_swagger_ui import get_swaggerui_blueprint
 
 app = Flask(__name__)
+CORS(app)
 SWAGGER_URL = '/api/v1/docs'  # URL for exposing Swagger UI (without trailing '/')
 API_URL = 'https://stanley-stackoverflow-lite.herokuapp.com/api/v1'  # Our API url (can of course be a local resource)
 

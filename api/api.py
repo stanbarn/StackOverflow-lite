@@ -6,12 +6,9 @@ import re
 from api.database import DatabaseConnection
 from flask_jwt_extended import create_access_token, get_jwt_identity
 from flask_jwt_extended import jwt_required
-from flask_cors import CORS
-from api import app
 database = DatabaseConnection()
 mod = Blueprint('questions', __name__)
 json_utility = utilities
-CORS(app)
 
 
 @mod.route('/')
